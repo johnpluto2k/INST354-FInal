@@ -264,7 +264,7 @@ extensionless URLs like `/about` -> `/public/about.html`.
 ## Rubric coverage at a glance
 
 | Rubric item                                            | Where it lives                                |
-| ------------------------------------------------------ | --------------------------------------------- |
+| ---------------------------------------------------- | --------------------------------------------- |
 | README top half (title, description, browsers, manual) | This file, top section                        |
 | Developer Manual (install, run, tests, API, roadmap)   | This file, "Developer Manual" section onward  |
 | Front end uses Fetch via the backend (>=3 calls)       | `public/js/common.js` (`api.get`, `api.post`, `api.del`); used by every page |
