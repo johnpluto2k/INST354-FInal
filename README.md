@@ -1,278 +1,166 @@
 # Pantry Plate
 
-**Authors:** John Bae &amp; Samvitti Nag
+**Authors:** John Bae & Samvitti Nag
 **Course:** INST 377 - Final Project
-**Stack:** Node.js / Express (Vercel serverless), Supabase (Postgres), vanilla HTML/CSS/JS frontend
-**Live site:** https://inst-354-f-inal.vercel.app/
-**Repository:** https://github.com/johnpluto2k/INST354-FInal
+**Live site:** https://inst-377-final-project-website1.vercel.app/
+**Repo:** https://github.com/johnpluto2k/INST377-Final-Project
 
 ---
 
-## Project description
+## What it is
 
-Pantry Plate is a recipe finder that helps households cut down on food waste
-by cooking from what they already have. The user types ingredients they own
-into a pantry list; the app calls the Spoonacular Food API to return recipes
-ranked by how many of those ingredients each recipe uses and how few new
-groceries the user would have to buy. Recipes can be opened for full
-instructions and dietary tags, and saved to a personal favorites list backed
-by a Supabase database.
+Pantry Plate is a web app that helps you cook with what you already have so
+less food goes to waste. You type in the ingredients in your fridge or
+pantry, and the app shows you recipes that use the most of them and require
+the fewest extra groceries. You can open any recipe for full instructions
+and save your favorites for later.
 
-The project app has five pages (Home, Recipe Detail, Favorites, About, Help),
-three authored backend endpoints (one external API proxy, one DB read, one
-DB write), and two frontend JS libraries (Swiper for the featured carousel,
-Chart.js for the pantry-coverage donut chart on each recipe).
+## What it uses
+
+- **Node.js / Express** backend, deployed as a serverless function on Vercel
+- **Supabase** (Postgres) for saving favorites
+- **Spoonacular Food API** for recipes
+- **Swiper** for the featured-recipes carousel
+- **Chart.js** for the pantry-coverage chart on each recipe
+- Plain HTML, CSS, and JavaScript on the frontend (no React, no build step)
+
+## Pages
+
+- **Home** - type ingredients, see matching recipes
+- **Recipe** - full recipe info, save button, pantry coverage chart
+- **Favorites** - your saved recipes (stored in Supabase)
+- **About** - what the project is and the food-waste problem
+- **Help** - how to use the app + FAQ
 
 ## Target browsers
 
-Tested on the most recent versions of **Chrome**, **Edge**, and **Firefox**
-on desktop. Mobile Chrome and Mobile Safari render correctly down to a
-375px viewport to fit phone screen size (the nav and recipe grid both collapse responsively).
-The app does not require any browser extensions in production - all
-external API calls go through our backend, so CORS is handled server-side.
+Works on the current versions of Chrome, Edge, and Firefox on desktop.
+It also works on mobile Chrome and Safari - the layout adjusts down to
+small phone screens.
 
-## Developer Manual
+---
 
-The audience for the rest of this document is a future developer who
-inherits the codebase. It assumes general knowledge of Node, Express, and
-web APIs but no prior exposure to Pantry Plate.
+## Developer manual
 
-- [Quick start](#quick-start)
-- [File structure](#file-structure)
-- [Pages](#pages)
-- [Backend API](#backend-api)
-- [External APIs and JS libraries](#external-apis-and-js-libraries)
-- [Styling](#styling)
-- [Deployment](#deployment)
-- [Known bugs and roadmap](#known-bugs-and-roadmap)
+This section is for someone who wants to run the project on their own
+computer or take over the code.
 
-### Quick start
+### Run it locally
 
-1. Clone the repo and install dependencies.
+1. Clone and install:
 
    ```bash
-   git clone https://github.com/johnpluto2k/INST354-FInal.git
-   cd INST354-FInal
+   git clone https://github.com/johnpluto2k/INST377-Final-Project.git
+   cd INST377-Final-Project
    npm install
    ```
 
-2. Create a Spoonacular account at https://spoonacular.com/food-api and
-   grab a free API key from the dashboard.
+2. Get a free Spoonacular key at https://spoonacular.com/food-api.
 
-3. Create a Supabase project at https://supabase.com, then open
-   **SQL Editor** and run the SQL from [`docs/SCHEMA.md`](docs/SCHEMA.md)
-   to create the `favorites` table.
+3. Make a Supabase project at https://supabase.com. In the SQL Editor,
+   run the SQL from [`docs/SCHEMA.md`](docs/SCHEMA.md) to create the
+   `favorites` table.
 
-4. Copy the example env file and fill in your keys.
-
-   ```bash
-   cp .env.example .env
-   ```
-
-   Then open `.env` and set:
+4. Copy `.env.example` to `.env` and fill in your three values:
 
    ```
    SPOONACULAR_API_KEY=...
-   SUPABASE_URL=https://<your-project-ref>.supabase.co
+   SUPABASE_URL=https://yourproject.supabase.co
    SUPABASE_ANON_KEY=...
    ```
 
-5. Start the dev server.
+5. Start the server:
 
    ```bash
    npm start
    ```
 
-   The site is now on http://localhost:3000. Confirm the backend is wired up
-   by visiting http://localhost:3000/api/health - it should report
-   `spoonacular: true` and `supabase: true`.
+   Open http://localhost:3000. Check http://localhost:3000/api/health to
+   confirm both services are connected.
 
-### Running tests
+### Testing
 
-No automated test suite is currently included. Manual test plan:
+There's no automated test suite. To test manually:
 
-- `GET /api/health` returns `{ ok: true, spoonacular: true, supabase: true }`.
-- On the Home page, add `tomato`, `rice`, `cheese`, click **Find Recipes**, and
-  confirm the status line reads "Found N recipes."
-- Click any recipe card -> the Recipe Detail page loads ingredients,
-  instructions, dietary tags, and the Chart.js coverage chart.
-- Click **Save to Favorites** -> open the Favorites page in a new tab and
-  confirm the recipe is listed. Click **Remove** -> it disappears.
-- Refresh each page and confirm there are no console errors.
+- `/api/health` should return `{ ok: true, spoonacular: true, supabase: true }`
+- Add `tomato, rice, cheese` on the Home page and click **Find Recipes** -
+  you should see a list of matching recipes
+- Open any recipe, click **Save to Favorites**, then open the Favorites
+  page - the recipe should be there
+- Click **Remove** on a favorite and confirm it disappears
 
-### File structure
+### Project files
 
 ```
-INST354-FInal/
-├── api/
-│   └── index.js          Express app (runs as a Vercel serverless function)
+INST377-Final-Project/
+├── api/index.js          Express backend (Vercel serverless function)
 ├── public/
-│   ├── index.html        Home (pantry input + carousel + grid)
-│   ├── recipe.html       Recipe Detail
-│   ├── favorites.html    Saved Favorites
-│   ├── about.html        About / food-waste problem
-│   ├── help.html         Usage guide + FAQ
-│   ├── css/
-│   │   └── styles.css    Catppuccin Mocha palette, Verdana font, bordered sections
-│   └── js/
-│       ├── common.js     api.get/post/del wrappers, pantry localStorage helper
-│       ├── home.js       Pantry chip UI, recipe search, Swiper carousel + grid
-│       ├── recipe.js     Recipe detail render + Chart.js coverage chart + save
-│       └── favorites.js  List + remove for saved recipes
-├── docs/
-│   └── SCHEMA.md         Supabase table SQL + where to paste keys
-├── server.js             Local dev entrypoint (Vercel ignores this)
-├── vercel.json           Routes /api/* to the serverless function, static otherwise
+│   ├── index.html        Home
+│   ├── recipe.html       Recipe detail
+│   ├── favorites.html    Saved recipes
+│   ├── about.html, help.html
+│   ├── css/styles.css    Shared stylesheet
+│   └── js/               common.js, home.js, recipe.js, favorites.js
+├── docs/SCHEMA.md        Supabase table SQL
+├── server.js             Local dev entrypoint
+├── vercel.json           Vercel routing config
 ├── package.json
-├── .env.example
-└── README.md             You are here
+└── README.md
 ```
 
-### Pages
+### Backend endpoints
 
-#### Home (`/` -> `public/index.html`)
+All three required endpoints live in `api/index.js`. The frontend only
+talks to these routes - it never calls Spoonacular or Supabase directly.
 
-- Text input plus **Add** button that pushes ingredient chips into
-  `localStorage`. Chips can be removed individually or cleared all at once.
-- **Find Recipes** calls `GET /api/recipes?ingredients=...` on our backend,
-  which proxies Spoonacular's `findByIngredients` endpoint with
-  `ranking=2&ignorePantry=true`.
-- Top 5 results render in a **Swiper** carousel; the full result set renders
-  as a responsive grid. Each card shows the recipe image, title, "uses N of
-  your ingredients," and a green/red **missing** count.
+| Method | Route                | What it does |
+| ------ | -------------------- | ------------ |
+| GET    | `/api/health`        | Sanity check - shows whether each env var is set |
+| GET    | `/api/recipes`       | Calls Spoonacular `findByIngredients` (external API) |
+| GET    | `/api/recipes/:id`   | Calls Spoonacular `recipes/{id}/information` for the detail page |
+| GET    | `/api/favorites`     | Reads saved recipes from Supabase (DB read) |
+| POST   | `/api/favorites`     | Writes a new favorite to Supabase (DB write) |
+| DELETE | `/api/favorites/:id` | Removes a saved recipe |
 
-#### Recipe Detail (`/recipe?id=...` -> `public/recipe.html`)
+### Deploying
 
-- Reads `?id=` from the URL and calls `GET /api/recipes/:id`, which proxies
-  Spoonacular's recipe-information endpoint.
-- Renders the hero image, title, ready-in-minutes, servings, and dietary
-  tags (vegetarian / vegan / gluten-free / dairy-free / healthy / cheap).
-- Lists every ingredient; pantry items the user already owns are colored
-  green.
-- A **Chart.js** doughnut chart visualizes pantry coverage: "in your pantry"
-  vs "need to buy."
-- **Save to Favorites** button posts the recipe to `POST /api/favorites`.
+1. Push to GitHub.
+2. Import the repo in Vercel.
+3. Add the three env vars (`SPOONACULAR_API_KEY`, `SUPABASE_URL`,
+   `SUPABASE_ANON_KEY`) in **Settings -> Environment Variables**.
+4. Click Deploy. Future pushes redeploy automatically.
 
-#### Saved Favorites (`/favorites` -> `public/favorites.html`)
+### Known bugs
 
-- Calls `GET /api/favorites`, which reads from the Supabase `favorites`
-  table.
-- Each saved recipe renders as a card with **Open** (jumps to the detail
-  page) and **Remove** (`DELETE /api/favorites/:id`).
+- Spoonacular's free tier is limited to ~150 requests/day. If you hit
+  the cap, the Home page shows an error - wait a bit or use a new key.
+- The favorites list is shared across all visitors (no user accounts).
+- Some Spoonacular recipes have broken image URLs - the cards still
+  render but the image is blank.
 
-#### About (`/about`) and Help (`/help`)
+### Roadmap
 
-- Fully static. About covers the food-waste problem, how the app works, and
-  team roles. Help is a step-by-step usage guide plus an FAQ.
-
-### Backend API
-
-All three required endpoints are authored in `api/index.js`. The frontend
-only ever talks to these routes - it never calls Spoonacular or Supabase
-directly. CORS, JSON parsing, and error handling are centralized here.
-
-| Method | Route                  | Source            | Description |
-| ------ | ---------------------- | ----------------- | ----------- |
-| GET    | `/api/health`          | -                 | Sanity check that returns whether each env var is set. |
-| GET    | `/api/recipes`         | Spoonacular       | Required `?ingredients=tomato,rice,cheese` plus optional `?number=12`. Proxies `findByIngredients`. **Satisfies "1 must get data from an external provider."** |
-| GET    | `/api/recipes/:id`     | Spoonacular       | Proxies `recipes/{id}/information` for the detail page. |
-| GET    | `/api/favorites`       | Supabase          | Returns all rows from the `favorites` table, newest first. **Satisfies "1 must retrieve data from your database."** |
-| POST   | `/api/favorites`       | Supabase          | Body `{ recipe_id, title, image, missed_count }`. Inserts a row. **Satisfies "1 must write data to your DB."** |
-| DELETE | `/api/favorites/:id`   | Supabase          | Removes a saved recipe by row id. |
-
-### External APIs and JS libraries
-
-| Service        | Used for                                                         | Auth          |
-| -------------- | ---------------------------------------------------------------- | ------------- |
-| Spoonacular    | Recipe search (`findByIngredients`) and details (`information`). | API key (env) |
-| Supabase       | `favorites` table reads/writes.                                  | Anon key (env) |
-
-| Library    | Where it's used                                                   |
-| ---------- | ----------------------------------------------------------------- |
-| Swiper 11  | Featured-recipes carousel on the Home page.                       |
-| Chart.js 4 | Pantry-coverage doughnut on the Recipe Detail page.               |
-
-Both libraries are loaded from a CDN (jsDelivr) so there is no build step.
-
-### Styling
-
-The frontend uses the Catppuccin Mocha palette with Verdana as the body
-font and simple bordered section boxes. The same look carries across all
-five pages.
-
-| Token        | Color     |
-| ------------ | --------- |
-| Background   | `#1e1e2e` |
-| Surface      | `#313244` |
-| Surface alt  | `#45475a` |
-| Text         | `#cdd6f4` |
-| Muted text   | `#a6adc8` |
-| Accent       | `#cba6f7` |
-| Accent hover | `#a675d6` |
-| Good (green) | `#a6e3a1` |
-| Bad (red)    | `#f38ba8` |
-
-### Deployment
-
-1. Push to `main` on GitHub.
-2. In **Vercel -> Add New -> Project**, import the repo.
-3. Framework preset: **Other**. Build command and output directory can stay
-   on defaults.
-4. Under **Environment Variables**, add:
-
-   - `SPOONACULAR_API_KEY`
-   - `SUPABASE_URL`
-   - `SUPABASE_ANON_KEY`
-
-5. Click **Deploy**. Subsequent `git push` calls auto-redeploy.
-
-The `vercel.json` in this repo routes `/api/*` to the Express function at
-`api/index.js` and serves everything else from `public/`, including
-extensionless URLs like `/about` -> `/public/about.html`.
-
-### Known bugs and roadmap
-
-**Known caveats**
-
-- Spoonacular's free tier is rate-limited to ~150 requests per day across
-  the whole project. Hitting the limit returns HTTP 402; the Home page
-  surfaces this as an error message.
-- The favorites list is shared across all visitors. Two people using the
-  deployment will see each other's saves. This is intentional for the demo;
-  see roadmap.
-- Spoonacular occasionally returns recipes with broken image URLs - the
-  card layout tolerates this but the image will be blank.
-- Ingredient matching is substring-based on the client (an ingredient is
-  marked "in pantry" if the recipe ingredient name contains a pantry word).
-  This works well for `cheese` -> `parmesan cheese` but can over-match for
-  short words like `oil`.
-
-**Roadmap**
-
-1. Add Supabase Auth so each user has their own favorites list.
-2. Move the pantry list off `localStorage` and into a per-user
-   `pantry` table so it follows the user across devices.
-3. Add a "filter by diet" control on the Home page (vegetarian, vegan,
-   gluten-free) passed straight through to Spoonacular's `complexSearch`.
-4. Cache Spoonacular responses on the server (in-memory or Supabase) to
-   stretch the free-tier rate limit further.
-5. Add a Cypress or Playwright test suite covering the three rubric flows
-   (find recipes, save favorite, remove favorite).
+1. Add Supabase Auth so each user has their own favorites.
+2. Move the pantry list from `localStorage` into a Supabase `pantry`
+   table so it follows the user across devices.
+3. Add diet filters (vegetarian, vegan, gluten-free) on the Home page.
+4. Cache Spoonacular responses on the backend to extend the rate limit.
+5. Add automated tests.
 
 ---
 
-## Rubric coverage at a glance
+## Rubric coverage
 
-| Rubric item                                            | Where it lives                                |
-| ---------------------------------------------------- | --------------------------------------------- |
-| README top half (title, description, browsers, manual) | This file, top section                        |
-| Developer Manual (install, run, tests, API, roadmap)   | This file, "Developer Manual" section onward  |
-| Front end uses Fetch via the backend (>=3 calls)       | `public/js/common.js` (`api.get`, `api.post`, `api.del`); used by every page |
-| Contemporary CSS                                       | `public/css/styles.css` (CSS variables, grid, flex) |
-| Cross-browser styling                                  | Tested on Chrome / Edge / Firefox             |
-| >=2 JS libraries                                       | Swiper (Home) + Chart.js (Recipe Detail)      |
-| >=3 application pages                                  | Home, About, Recipe Detail (plus Favorites and Help) |
-| Supabase connection                                    | `api/index.js` `createClient`                 |
-| 3 authored endpoints (1 read DB, 1 write DB, 1 external) | `GET /api/favorites`, `POST /api/favorites`, `GET /api/recipes` |
-| All 3 endpoints used by the front end                  | Home page (`/api/recipes`), Recipe Detail (`POST /api/favorites`), Favorites (`GET /api/favorites`) |
-| Deployed to Vercel                                     | https://inst-354-f-inal.vercel.app/           |
+| Item                                                | Where |
+| --------------------------------------------------- | ----- |
+| README top half (title, description, browsers)      | Top of this file |
+| Developer manual                                    | "Developer manual" section above |
+| Fetch via backend (3+ calls)                        | `public/js/common.js` - used by every page |
+| Contemporary CSS                                    | `public/css/styles.css` (CSS vars, grid, flexbox) |
+| Works on Chrome / Edge / Firefox                    | Tested |
+| 2 JS libraries                                      | Swiper (Home) + Chart.js (Recipe) |
+| 3+ pages                                            | Home, About, Recipe Detail (also Favorites, Help) |
+| Supabase connection                                 | `api/index.js` |
+| 3 authored endpoints (read DB, write DB, external)  | `GET /api/favorites`, `POST /api/favorites`, `GET /api/recipes` |
+| All endpoints used by frontend                      | Yes - Home, Recipe, Favorites |
+| Deployed to Vercel                                  | https://inst-377-final-project-website1.vercel.app/ |
