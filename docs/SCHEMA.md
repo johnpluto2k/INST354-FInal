@@ -15,9 +15,7 @@ create table public.favorites (
   created_at   timestamptz default now()
 );
 
--- For a class demo we leave RLS off so the anon key can read and insert.
--- If you turn RLS on, add policies that allow select/insert for the anon role.
-alter table public.favorites disable row level security;
+
 ```
 
 After running the SQL, copy the values from **Project Settings -> API**:
