@@ -1,9 +1,3 @@
-// common.js - shared helpers used by every page.
-
-// Thin wrapper around fetch that always hits OUR backend, parses JSON,
-// and throws on non-2xx. Frontend pages NEVER talk to Spoonacular or
-// Supabase directly; the rubric requires all 3 fetches to go through
-// our authored API.
 window.api = {
   async get(path) {
     const res = await fetch(path);
@@ -35,7 +29,6 @@ window.api = {
   },
 };
 
-// Tiny localStorage wrapper for the pantry list (persists across pages).
 window.pantry = {
   KEY: "pantry-plate.pantry",
   get() {
@@ -66,7 +59,6 @@ window.pantry = {
   },
 };
 
-// Status-message helper used by every page.
 window.setStatus = function setStatus(elId, text, kind) {
   const el = document.getElementById(elId);
   if (!el) return;
