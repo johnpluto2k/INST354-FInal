@@ -1,5 +1,5 @@
 {
-  "name": "inst354-final",
+  "name": "inst377-final",
   "version": "1.0.0",
   "description": "Recipe app that reduces food waste by suggesting meals from ingredients the user already owns.",
   "main": "api/index.js",
