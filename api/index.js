@@ -1,13 +1,3 @@
-// api/index.js
-// Express app that runs as a single Vercel serverless function.
-// Three authored endpoints:
-//   GET  /api/recipes        -> proxies Spoonacular (external data)
-//   GET  /api/favorites      -> reads saved recipes from Supabase
-//   POST /api/favorites      -> writes a saved recipe to Supabase
-//
-// A fourth helper endpoint (GET /api/recipes/:id) proxies the Spoonacular
-// recipe-detail call so the Recipe Detail page can run through the backend.
-
 const express = require("express");
 const cors = require("cors");
 const { createClient } = require("@supabase/supabase-js");
