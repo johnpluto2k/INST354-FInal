@@ -1,5 +1,3 @@
-// recipe.js - recipe detail page (Spoonacular id from ?id= query param).
-
 document.addEventListener("DOMContentLoaded", async () => {
   const params = new URLSearchParams(window.location.search);
   const id = params.get("id");
@@ -31,7 +29,6 @@ function renderRecipe(r) {
   document.getElementById("detail-servings").textContent = r.servings ?? "--";
   document.title = "Pantry Plate - " + (r.title || "Recipe");
 
-  // Dietary tags
   const tagRow = document.getElementById("detail-tags");
   tagRow.innerHTML = "";
   const flags = [
@@ -53,7 +50,6 @@ function renderRecipe(r) {
     tagRow.innerHTML = '<span class="muted">No dietary tags.</span>';
   }
 
-  // Ingredients
   const list = document.getElementById("ingredient-list");
   list.innerHTML = "";
   const pantrySet = new Set(window.pantry.get());
@@ -69,7 +65,6 @@ function renderRecipe(r) {
     list.appendChild(li);
   }
 
-  // Coverage chart (Chart.js)
   const total = ingredients.length || 1;
   const missing = Math.max(0, total - owned);
   if (window.Chart) {
@@ -97,7 +92,6 @@ function renderRecipe(r) {
     });
   }
 
-  // Instructions - prefer analyzed steps, fall back to plain instructions
   const ol = document.getElementById("instruction-list");
   ol.innerHTML = "";
   const steps =
@@ -119,7 +113,6 @@ function renderRecipe(r) {
     ol.innerHTML = '<li class="muted">No instructions provided.</li>';
   }
 
-  // Save-favorite handler
   document.getElementById("save-favorite-btn").addEventListener("click", async () => {
     try {
       setStatus("save-status", "Saving...", "");
